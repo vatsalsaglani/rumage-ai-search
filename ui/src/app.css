@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Customizes the scrollbar for Chrome, Edge, and Safari */
+::-webkit-scrollbar {
+  width: 12px; /* Adjust scrollbar thickness */
+}
+
+::-webkit-scrollbar-track {
+  background: #1F2937; /* Track color */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #1F2937; /* Scroll thumb color */
+  border-radius: 6px; /* Roundness of the scroll thumb */
+  border: 3px solid #1F2937; /* Creates padding around the scroll thumb */
+}
+
+/* Hover effects for the scroll thumb */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #4d5f79; /* Scroll thumb color on hover */
+}
+
+/* Customizes the scrollbar for Firefox */
+* {
+  scrollbar-width: thin; /* 'auto' or 'thin' */
+  scrollbar-color: #51647f #1F2937; /* Thumb and track color */
+}
