@@ -11,6 +11,7 @@ from configs import (ANTHROPIC_API_KEY, GROQ_API_KEY, ANTHROPIC_ANSWER_MODEL,
                      GROQ_CONTENT_SUMMARY_MODEL, OPENAI_API_KEY, OPENAI_MODEL,
                      QUERY_PLANNING_LLM_NAME, WEB_PAGE_SUMMARY_LLM_NAME,
                      ANSWERING_LLM_NAME)
+from tqdm import trange
 
 llm = AnthropicLLM(ANTHROPIC_API_KEY)
 llm_stream = AnthropicLLMStream(ANTHROPIC_API_KEY)
@@ -77,7 +78,7 @@ async def search(search_query: str, llm_name: str):
 flatten = lambda lst: [item for sublist in lst for item in sublist]
 
 
-async def plannedSearch(search_query: str, min_links_per_query: int = 3):
+async def plannedSearch(search_query: str, min_links_per_query: int = 2):
 
     planner = AnthropicPlanner(ANTHROPIC_API_KEY)
     web_page_summary_llm = llm2class[WEB_PAGE_SUMMARY_LLM_NAME]["completion"](
@@ -108,14 +109,27 @@ async def plannedSearch(search_query: str, min_links_per_query: int = 3):
     # print(f'Final Set of Links: {links}')
     # NOTE: Use the concurrent one when no rate limit issues
     st_time = time.time()
-    retrieved_summarized_contents = await asyncio.gather(*[
-        get_page_text_content(
-            url, search_query, web_page_summary_llm,
-            llm2class[WEB_PAGE_SUMMARY_LLM_NAME].get("content_summary_model"))
-        for url in links
-    ],
-                                                         return_exceptions=True
-                                                         )
+    # NOTE: Async call in batches to avoid too ratelimit
+    retrieved_summarized_contents = []
+    for ix in trange(0, len(links), 4):
+        retrieved_summarized_contents += await asyncio.gather(
+            *[
+                get_page_text_content(
+                    url, search_query, web_page_summary_llm,
+                    llm2class[WEB_PAGE_SUMMARY_LLM_NAME].get(
+                        "content_summary_model")) for url in links[ix:ix + 4]
+            ],
+            return_exceptions=True)
+        await asyncio.sleep(1)
+    # NOTE: Use this when no rate limit issues
+    # retrieved_summarized_contents = await asyncio.gather(*[
+    #     get_page_text_content(
+    #         url, search_query, web_page_summary_llm,
+    #         llm2class[WEB_PAGE_SUMMARY_LLM_NAME].get("content_summary_model"))
+    #     for url in links
+    # ],
+    #                                                      return_exceptions=True
+    #                                                      )
     en_time = time.time()
     summarization_time = en_time - st_time
     yield f"\n- Summarization Completed _({summarization_time:.3f}s)_"
