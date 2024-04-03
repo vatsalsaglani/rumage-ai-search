@@ -5,7 +5,7 @@ from typing import List, Dict
 class MessageManagement:
     """Removes tokens from start or end and provides string with max token lenght provided"""
 
-    def __init__(self, model_name: str = "gpt-3.5-turbo-16k"):
+    def __init__(self, model_name: str = "gpt-4-turbo-preview"):
         self.encoding = tiktoken.encoding_for_model(model_name)
 
     def __count_tokens__(self, content: str):
