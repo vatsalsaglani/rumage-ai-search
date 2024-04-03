@@ -1,4 +1,6 @@
 from openai import AsyncOpenAI
+import random
+import asyncio
 import traceback
 from typing import List, Dict, Union
 from llms.base import BaseLLM
@@ -24,8 +26,10 @@ class OpenAILLM(BaseLLM):
                 del kwargs["system"]
             manageContext = MessageManagement()
             messages = manageContext(messages,
-                                     kwargs.get("ctx_length", 14_000))
+                                     kwargs.get("ctx_length", 100_000))
             # print(f"OPENAI MESSAGES: ", messages)
+            print(model)
+            await asyncio.sleep(random.choice([0.5, 1, 0.8, 0.9]))
             output = await self.client.chat.completions.create(
                 messages=messages, model=model, temperature=0.2, **kwargs)
             output_content = output.choices[0].message.content
@@ -53,7 +57,9 @@ class OpenAILLMStream(BaseLLM):
             }] + messages
             del kwargs["system"]
         manageContext = MessageManagement()
-        messages = manageContext(messages, kwargs.get("ctx_length", 14_000))
+        messages = manageContext(messages, kwargs.get("ctx_length", 100_000))
+        print(model)
+        await asyncio.sleep(random.choice([0.5, 1, 0.8, 0.9]))
         stream = await self.client.chat.completions.create(model=model,
                                                            messages=messages,
                                                            temperature=0.2,
