@@ -63,7 +63,7 @@ class OpenAILLMStream(BaseLLM):
         stream = await self.client.chat.completions.create(model=model,
                                                            messages=messages,
                                                            temperature=0.2,
-                                                           max_tokens=1024,
+                                                           stream=True,
                                                            **kwargs)
         async for chunk in stream:
             yield chunk.choices[0].delta.content or ""

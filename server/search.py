@@ -5,21 +5,10 @@ from browser.browse import (get_search_results, retrieve_search_links,
 from llms.anthropic import AnthropicLLM, AnthropicLLMStream
 from llms.groq import GroqLLM, GroqLLMStream
 from llms.openai_complete import OpenAILLM, OpenAILLMStream
+from llms.mistralai_complete import MistralAILLM, MistralAILLMStream
 from agent.query_planning import AnthropicPlanner
-from configs import (ANTHROPIC_API_KEY, GROQ_API_KEY, ANTHROPIC_ANSWER_MODEL,
-                     ANTHROPIC_CONTENT_SUMMARY_MODEL, GROQ_ANSWER_MODEL,
-                     GROQ_CONTENT_SUMMARY_MODEL, OPENAI_API_KEY, OPENAI_MODEL,
-                     QUERY_PLANNING_LLM_NAME, WEB_PAGE_SUMMARY_LLM_NAME,
-                     ANSWERING_LLM_NAME)
+from configs import *
 from tqdm import trange
-
-llm = AnthropicLLM(ANTHROPIC_API_KEY)
-llm_stream = AnthropicLLMStream(ANTHROPIC_API_KEY)
-
-groq_llm = GroqLLM(GROQ_API_KEY)
-groq_llm_stream = GroqLLMStream(GROQ_API_KEY)
-
-openai_llm = OpenAILLM(OPENAI_API_KEY)
 
 SEARCH_PROMPT = """Given a search query in <query></query> and the search results in <search-results></search-results> try to answer the search query as precisely as possible. Try to provide citation links for the URL of result. Only answer if the answer is possible from the search results, else politely reply that you didn't find anything relevant.
 Provide as much explanation as you can but don't go to overboard.
@@ -47,6 +36,13 @@ llm2class = {
         "api_key": OPENAI_API_KEY,
         "content_summary_model": OPENAI_MODEL,
         "answering_model": OPENAI_MODEL
+    },
+    "mistralai": {
+        "completion": MistralAILLM,
+        "stream": MistralAILLMStream,
+        "api_key": MISTRAL_API_KEY,
+        "content_summary_model": MISTRAL_CONTENT_SUMMARY_MODEL,
+        "answering_model": MISTRAL_ANSWER_MODEL
     }
 }
 
